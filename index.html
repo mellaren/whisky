@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Spirits of Scotland</title>
+    <meta
+      name="viewport"
+      content="initial-scale=1,maximum-scale=1,user-scalable=no"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Amarante&family=Averia+Serif+Libre:wght@700&family=Bebas+Neue&family=Calistoga&family=Eczar:wght@500;700&family=Germania+One&family=Goblin+One&family=Katibeh&family=Oswald:wght@600&family=Rakkas&family=Sofia+Sans+Condensed:wght@800&display=swap"
+      rel="stylesheet"
+    />
+    />
+    <link
+      href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css"
+      rel="stylesheet"
+    />
+    <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
+
+    <!-- Search -->
+    <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.7.0/mapbox-gl-geocoder.min.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.7.0/mapbox-gl-geocoder.css"
+      type="text/css"
+    />
+
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+      }
+
+      #map {
+        position: absolute;
+        z-index: 1;
+        top: 0;
+        bottom: 0;
+        width: 100%;
+      }
+      header {
+        position: relative;
+      }
+      h1 {
+        position: absolute;
+        display: inline-block;
+        z-index: 2;
+        top: 0;
+        left: 20px;
+        font-family: "Bebas Neue", sans-serif;
+        font-size: 45px;
+        margin-left: 20px;
+        margin-top: 20px;
+        color: #191919;
+      }
+
+      h2 {
+        position: absolute;
+        display: inline-block;
+        z-index: 2;
+        top: 0px;
+        left: 20px;
+        font-family: "Bebas Neue", sans-serif;
+        font-size: 22px;
+        margin-left: 20px;
+        margin-top: 70px;
+        color: #191919;
+      }
+    </style>
+  </head>
+  <body>
+    <header id="menu">
+      <h1 id="title">Spirits of Scotland</h1>
+      <h2>Whisky Distilleries Map</h2>
+    </header>
+
+    <div id="map"></div>
+
+    <script>
+      mapboxgl.accessToken =
+        "pk.eyJ1IjoibWlsYW5hZ2xlYm92YSIsImEiOiJja2JtZjMzc3UxaTFpMnpxdmlneTRlMmU3In0.kRqcBdt_UVaS586NEMezTA";
+      const bounds = [
+        [-11.74296, 48.66374],
+        [7.65795, 65.20539],
+      ];
+      const map = new mapboxgl.Map({
+        container: "map", // container ID
+        // Choose from Mapbox's core styles, or make your own style with Mapbox Studio
+        style: "mapbox://styles/milanaglebova/cli7f4sjq00fb01qydjn2gzat",
+        center: [-5.97138, 56.97709], // starting position [lng, lat]
+        zoom: 6.57, // starting zoom
+        maxBounds: bounds,
+      });
+
+      // Pop-ups
+
+      map.on("click", (event) => {
+        // If the user clicked on one of your markers, get its information.
+        const features = map.queryRenderedFeatures(event.point, {
+          layers: ["distilleries-2805-23l0vs"], // replace with your layer name
+        });
+        if (!features.length) {
+          return;
+        }
+        const feature = features[0];
+
+        const popup = new mapboxgl.Popup({ offset: [0, -15] })
+          .setLngLat(feature.geometry.coordinates)
+          .setHTML(
+            `<h3>${feature.properties.Name}</h3><p>Founded in ${feature.properties.Founded}</br><p>Region: ${feature.properties.Region}</p><p>Type: ${feature.properties.Type}</p><p>Owned by ${feature.properties.Owner}</p><p>Tours: ${feature.properties.Tours_comment}</p>`
+          )
+          .addTo(map);
+      });
+
+      //Search places
+      const geocoder = new MapboxGeocoder({
+        // Initialize the geocoder
+        accessToken: (mapboxgl.accessToken =
+          "pk.eyJ1IjoibWlsYW5hZ2xlYm92YSIsImEiOiJja2JtZjMzc3UxaTFpMnpxdmlneTRlMmU3In0.kRqcBdt_UVaS586NEMezTA"),
+
+        mapboxgl: mapboxgl, // Set the mapbox-gl instance
+        marker: false, // Do not use the default marker style
+        placeholder: "Search for distilleries",
+        bbox: [-19.47878, 53.16691, 9.54586, 60.30403],
+        proximity: {
+          longitude: -4.29015,
+          latitude: 56.51952,
+        },
+      });
+
+      // Add the geocoder to the map
+      map.addControl(geocoder);
+
+      /*markers at selected results*/
+      // After the map style has loaded on the page,
+      // add a source layer and default styling for a single point
+      map.on("load", () => {
+        map.addSource("single-point", {
+          type: "geojson",
+          data: {
+            type: "FeatureCollection",
+            features: [],
+          },
+        });
+
+        map.addLayer({
+          id: "point",
+          source: "single-point",
+          type: "circle",
+          paint: {
+            "circle-radius": 10,
+            "circle-color": "#448ee4",
+          },
+        });
+
+        // Listen for the `result` event from the Geocoder
+        // `result` event is triggered when a user makes a selection
+        //  Add a marker at the result's coordinates
+        geocoder.on("result", (event) => {
+          map.getSource("single-point").setData(event.result.geometry);
+        });
+      });
+    </script>
+  </body>
+</html>
