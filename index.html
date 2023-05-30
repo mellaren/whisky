@@ -9,8 +9,10 @@
     />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Amarante&family=Averia+Serif+Libre:wght@700&family=Bebas+Neue&family=Calistoga&family=Eczar:wght@500;700&family=Germania+One&family=Goblin+One&family=Katibeh&family=Oswald:wght@600&family=Rakkas&family=Sofia+Sans+Condensed:wght@800&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Figtree:wght@400;600&display=swap"
       rel="stylesheet"
     />
     />
@@ -69,6 +71,37 @@
         margin-top: 70px;
         color: #191919;
       }
+
+      .mapboxgl-popup {
+        min-width: 250px;
+        max-width: 400px;
+        font-family: "Figtree", sans-serif;
+      }
+
+      .mapboxgl-popup-content {
+        color: #000000;
+        background-color: rgba(255, 255, 255, 0.85);
+        border-radius: 8px;
+        padding: 20px;
+      }
+
+      .mapboxgl-popup-content h3 {
+        margin: 0 0 8px 0;
+        font-size: 18px;
+        font-weight: 600;
+      }
+
+      .mapboxgl-popup-content p {
+        font-weight: 400;
+        font-size: 14px;
+        margin: 0%;
+      }
+
+      .mapboxgl-popup-content a {
+        font-weight: 400;
+        font-size: 14px;
+        margin: 0%;
+      }
     </style>
   </head>
   <body>
@@ -102,6 +135,7 @@
         const features = map.queryRenderedFeatures(event.point, {
           layers: ["distilleries-2805-23l0vs"], // replace with your layer name
         });
+
         if (!features.length) {
           return;
         }
@@ -110,7 +144,13 @@
         const popup = new mapboxgl.Popup({ offset: [0, -15] })
           .setLngLat(feature.geometry.coordinates)
           .setHTML(
-            `<h3>${feature.properties.Name}</h3><p>Founded in ${feature.properties.Founded}</br><p>Region: ${feature.properties.Region}</p><p>Type: ${feature.properties.Type}</p><p>Owned by ${feature.properties.Owner}</p><p>Tours: ${feature.properties.Tours_comment}</p>`
+            `<h3>${feature.properties.Name}</h3>
+            <p>Founded in ${feature.properties.Founded}</p>
+            <p>Region: ${feature.properties.Region}</p>
+            <p>Type: ${feature.properties.Type}</p>
+            <p>Owned by ${feature.properties.Owner}</p>
+            <p>Tours: ${feature.properties.Tours_comment}</p>
+            <a href="${feature.properties.Web}" target="_blank">Visit Website</a>`
           )
           .addTo(map);
       });
@@ -146,15 +186,35 @@
           },
         });
 
+        map.on("click", (event) => {
+          const clickedFeatures = map.queryRenderedFeatures(event.point);
+
+          if (clickedFeatures.length === 0 && map.getSource("single-point")) {
+            // If user clicked an empty space and there's a marker, remove it
+            map.getSource("single-point").setData({
+              type: "FeatureCollection",
+              features: [], // No features, marker will disappear
+            });
+          } else {
+            // Handle your current click logic
+          }
+        });
+
         map.addLayer({
           id: "point",
           source: "single-point",
           type: "circle",
           paint: {
             "circle-radius": 10,
-            "circle-color": "#448ee4",
+            "circle-color": "#00000000",
+            // "circle-transparency": 0.5,
           },
         });
+
+        function clearResults() {
+          geocoderControl._input.value = "";
+          geocoderControl._results.innerHTML = "";
+        }
 
         // Listen for the `result` event from the Geocoder
         // `result` event is triggered when a user makes a selection
@@ -163,6 +223,10 @@
           map.getSource("single-point").setData(event.result.geometry);
         });
       });
+
+      //Add scale bar and navigation buttons
+      map.addControl(new mapboxgl.ScaleControl(), "bottom-right");
+      map.addControl(new mapboxgl.NavigationControl());
     </script>
   </body>
 </html>
