@@ -45,6 +45,7 @@
       }
       header {
         position: relative;
+        width: 100%;
       }
       h1 {
         position: absolute;
@@ -70,6 +71,25 @@
         margin-left: 20px;
         margin-top: 70px;
         color: #191919;
+      }
+
+      h3 {
+        font-family: "Figtree", sans-serif;
+        font-size: 18px;
+        font-weight: 600;
+      }
+
+      #legend {
+        position: relative;
+      }
+
+      #legend-img {
+        position: absolute;
+        display: inline-block;
+        z-index: 3;
+        width: 240px;
+        top: 100px;
+        left: 20px;
       }
 
       .mapboxgl-popup {
@@ -102,6 +122,77 @@
         font-size: 14px;
         margin: 0%;
       }
+
+      /* The sidepanel menu */
+      .sidepanel {
+        height: 240px; 
+        width: 0; 
+        position: absolute; 
+        z-index: 3; 
+        top: 160px;
+        left: 0;
+        background-color: #fefcfa;
+        overflow-x: hidden;
+        padding-top: 0;/
+        transition: 0.5s;
+        border-top-right-radius: 10px;
+        border-bottom-right-radius: 10px;
+      }
+
+      /* The sidepanel links */
+      .sidepanel li {
+        /* position: absolute; */
+        top: 10px;
+        left: 0px;
+        padding: 4px 8px 4px 4px;
+        text-decoration: none;
+        font-family: "Figtree", sans-serif;
+        font-size: 14px;
+        color: black;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        transition: 0.3s;
+      }
+
+      /* Position and style the close button (top right corner) */
+      .sidepanel .closebtn {
+        position: absolute;
+        top: 0;
+        right: 10px;
+        text-decoration: none;
+        font-family: "Figtree", sans-serif;
+        font-weight: 400;
+        font-size: 32px;
+        color: black;
+        /* margin-right: 10px; */
+      }
+
+      /* Style the button that is used to open the sidepanel */
+      .openbtn {
+        position: fixed;
+        z-index: 2;
+        top: 200px;
+        left: -40px;
+        font-size: 20px;
+        cursor: pointer;
+        background-color: rgba(255, 255, 255, 0.85);
+        color: black;
+        padding: 10px 15px 10px;
+        border: none;
+        transform: rotate(-90deg);
+        transform-origin: ;
+        border-radius: 0 0 10px 10px;
+      }
+
+      .openbtn:hover {
+        background-color: #9a9a9a;
+        color: white;
+      }
+
+      #icon {
+        display: inline;
+      }
     </style>
   </head>
   <body>
@@ -109,6 +200,51 @@
       <h1 id="title">Spirits of Scotland</h1>
       <h2>Whisky Distilleries Map</h2>
     </header>
+
+    <div id="mySidepanel" class="sidepanel">
+      <a href="javascript:void(0)" class="closebtn" onclick="closeNav()"
+        >&times;</a
+      >
+      <ul>
+        <li>
+          <img
+            id="icon"
+            src="img/barrel-big-highland.svg"
+            width="26px"
+          />Highlands
+        </li>
+        <li>
+          <img
+            id="icon"
+            src="img/barrel-big-speyside.svg"
+            width="26px"
+          />Speyside
+        </li>
+        <li>
+          <img
+            id="icon"
+            src="img/barrel-big-lowland.svg"
+            width="26px"
+          />Lowlands
+        </li>
+        <li>
+          <img
+            id="icon"
+            src="img/barrel-big-campbeltown.svg"
+            width="26px"
+          />Campbeltown
+        </li>
+        <li>
+          <img id="icon" src="img/barrel-big-islay.svg" width="26px" />Islay
+        </li>
+        <li>
+          <img id="icon" src="img/barrel-big-islands.svg" width="26px" />The
+          Islands
+        </li>
+      </ul>
+    </div>
+
+    <button class="openbtn" onclick="openNav()">&#8595; Regions</button>
 
     <div id="map"></div>
 
@@ -225,8 +361,18 @@
       });
 
       //Add scale bar and navigation buttons
-      map.addControl(new mapboxgl.ScaleControl(), "bottom-right");
+      // map.addControl(new mapboxgl.ScaleControl(), "bottom-right");
       map.addControl(new mapboxgl.NavigationControl());
+
+      //Sidepanel
+      function openNav() {
+        document.getElementById("mySidepanel").style.width = "220px";
+      }
+
+      /* Set the width of the sidebar to 0 (hide it) */
+      function closeNav() {
+        document.getElementById("mySidepanel").style.width = "0";
+      }
     </script>
   </body>
 </html>
