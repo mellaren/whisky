@@ -141,7 +141,6 @@
 
       /* The sidepanel links */
       .sidepanel li {
-        /* position: absolute; */
         top: 10px;
         left: 0px;
         padding: 4px 8px 4px 4px;
@@ -165,7 +164,6 @@
         font-weight: 400;
         font-size: 32px;
         color: black;
-        /* margin-right: 10px; */
       }
 
       /* Style the button that is used to open the sidepanel */
@@ -256,20 +254,19 @@
         [7.65795, 65.20539],
       ];
       const map = new mapboxgl.Map({
-        container: "map", // container ID
-        // Choose from Mapbox's core styles, or make your own style with Mapbox Studio
+        container: "map", 
         style: "mapbox://styles/milanaglebova/cli7f4sjq00fb01qydjn2gzat",
-        center: [-5.97138, 56.97709], // starting position [lng, lat]
-        zoom: 6.57, // starting zoom
+        center: [-5.97138, 56.97709], 
+        zoom: 6.57, 
         maxBounds: bounds,
       });
 
       // Pop-ups
 
       map.on("click", (event) => {
-        // If the user clicked on one of your markers, get its information.
+
         const features = map.queryRenderedFeatures(event.point, {
-          layers: ["distilleries-3105-8yplo7"], // replace with your layer name
+          layers: ["distilleries-3105-8yplo7"],
         });
 
         if (!features.length) {
@@ -293,12 +290,12 @@
 
       //Search places
       const geocoder = new MapboxGeocoder({
-        // Initialize the geocoder
+
         accessToken: (mapboxgl.accessToken =
           "pk.eyJ1IjoibWlsYW5hZ2xlYm92YSIsImEiOiJja2JtZjMzc3UxaTFpMnpxdmlneTRlMmU3In0.kRqcBdt_UVaS586NEMezTA"),
 
-        mapboxgl: mapboxgl, // Set the mapbox-gl instance
-        marker: false, // Do not use the default marker style
+        mapboxgl: mapboxgl, 
+        marker: false, 
         placeholder: "Search for distilleries",
         bbox: [-19.47878, 53.16691, 9.54586, 60.30403],
         proximity: {
@@ -307,12 +304,10 @@
         },
       });
 
-      // Add the geocoder to the map
+
       map.addControl(geocoder);
 
-      /*markers at selected results*/
-      // After the map style has loaded on the page,
-      // add a source layer and default styling for a single point
+
       map.on("load", () => {
         map.addSource("single-point", {
           type: "geojson",
@@ -326,13 +321,12 @@
           const clickedFeatures = map.queryRenderedFeatures(event.point);
 
           if (clickedFeatures.length === 0 && map.getSource("single-point")) {
-            // If user clicked an empty space and there's a marker, remove it
+
             map.getSource("single-point").setData({
               type: "FeatureCollection",
-              features: [], // No features, marker will disappear
+              features: [], 
             });
           } else {
-            // Handle your current click logic
           }
         });
 
@@ -352,16 +346,12 @@
           geocoderControl._results.innerHTML = "";
         }
 
-        // Listen for the `result` event from the Geocoder
-        // `result` event is triggered when a user makes a selection
-        //  Add a marker at the result's coordinates
+
         geocoder.on("result", (event) => {
           map.getSource("single-point").setData(event.result.geometry);
         });
       });
 
-      //Add scale bar and navigation buttons
-      // map.addControl(new mapboxgl.ScaleControl(), "bottom-right");
       map.addControl(new mapboxgl.NavigationControl());
 
       //Sidepanel
@@ -369,7 +359,6 @@
         document.getElementById("mySidepanel").style.width = "220px";
       }
 
-      /* Set the width of the sidebar to 0 (hide it) */
       function closeNav() {
         document.getElementById("mySidepanel").style.width = "0";
       }
